@@ -171,6 +171,18 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
     ScopedNoDenormals noDenormals;
     //const int totalNumInputChannels  = getTotalNumInputChannels();
     //const int totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    //change color of keyboard on press
+    MidiMessage msg;
+    int ignore;
+    for (MidiBuffer::Iterator it (midiMessages); it.getNextEvent (msg, ignore);) {
+        if(msg.isNoteOn()) {
+            keyboardState.noteOn(msg.getChannel(), msg.getNoteNumber(), msg.getVelocity() / 127.0f);
+        }
+        else if(msg.isNoteOff()) {
+            keyboardState.noteOff(msg.getChannel(), msg.getNoteNumber(), msg.getVelocity() / 127.0f);
+        }
+    }
 
     //get the voice and get the params needed to make the voice
     for (int i = 0; i < mySynth.getNumVoices(); i++) {
