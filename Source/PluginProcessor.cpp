@@ -9,18 +9,27 @@
 #include "PluginEditor.h"
 
 //==============================================================================
+static Array<float> getSimpleNoise(int numSamples) {
+    Random r = Random::getSystemRandom();
+    Array<float> noise;
+    for (int s = 0; s < numSamples; s++) {
+        noise.add((r.nextFloat() - .5) * 2);
+    }
+    return noise;
+}
+
 JuceSynthFrameworkAudioProcessor::JuceSynthFrameworkAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", AudioChannelSet::stereo(), true)
+#endif
+    )
     , tree(*this, nullptr, "PARAMETERS",
-        {   std::make_unique<AudioParameterFloat>("attack", "Attack", NormalisableRange<float>(0.1f, 5000.0f), 0.1f),
+        { std::make_unique<AudioParameterFloat>("attack", "Attack", NormalisableRange<float>(0.1f, 5000.0f), 0.1f),
             std::make_unique<AudioParameterFloat>("decay", "Decay", NormalisableRange<float>(1.0f, 2000.0f), 1.0f),
             std::make_unique<AudioParameterFloat>("sustain", "Sustain", NormalisableRange<float>(0.0f, 1.0f), 0.8f),
             std::make_unique<AudioParameterFloat>("release", "Release", NormalisableRange<float>(0.1f, 5000.0f), 0.1f),
@@ -34,6 +43,9 @@ JuceSynthFrameworkAudioProcessor::JuceSynthFrameworkAudioProcessor()
             std::make_unique<AudioParameterFloat>("blend", "Osc2Blend", NormalisableRange<float>(0.0f, 1.0f), 0.6f),
             std::make_unique<AudioParameterFloat>("blend2", "Osc3Blend", NormalisableRange<float>(0.0f, 1.0f), 0.6f),
             std::make_unique<AudioParameterFloat>("blend3", "Osc4Blend", NormalisableRange<float>(0.0f, 1.0f), 0.6f),
+            std::make_unique<AudioParameterFloat>("crushDown", "CrushDown", NormalisableRange<float>(1.0f, 50.0f), 1.0f),
+            std::make_unique<AudioParameterFloat>("crushRes", "CrushRes", NormalisableRange<float>(1.0f, 32.0f), 32.0f),
+            std::make_unique<AudioParameterFloat>("crushTog", "CrushTog", NormalisableRange<float>(1.0f, 2.0f), 1.0f),
             std::make_unique<AudioParameterFloat>("mastergain", "MasterGain", NormalisableRange<float>(0.0f, 1.0f), 0.7f),
             std::make_unique<AudioParameterFloat>("pbup", "PBup", NormalisableRange<float>(1.0f, 12.0f), 2.0f),
             std::make_unique<AudioParameterFloat>("pbdown", "PBdown", NormalisableRange<float>(1.0f, 12.0f), 2.0f),
@@ -94,16 +106,14 @@ int JuceSynthFrameworkAudioProcessor::getCurrentProgram() {
     return 0;
 }
 
-void JuceSynthFrameworkAudioProcessor::setCurrentProgram (int index)
-{
+void JuceSynthFrameworkAudioProcessor::setCurrentProgram (int index) {
 }
 
 const String JuceSynthFrameworkAudioProcessor::getProgramName (int index) {
     return {};
 }
 
-void JuceSynthFrameworkAudioProcessor::changeProgramName (int index, const String& newName)
-{
+void JuceSynthFrameworkAudioProcessor::changeProgramName (int index, const String& newName) {
 }
 
 //==============================================================================
@@ -122,14 +132,12 @@ void JuceSynthFrameworkAudioProcessor::prepareToPlay (double sampleRate, int sam
     updateFilter();
 }
 
-void JuceSynthFrameworkAudioProcessor::releaseResources()
-{
+void JuceSynthFrameworkAudioProcessor::releaseResources() {
     // When playback stops, you can use this as an opportunity to free up any spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool JuceSynthFrameworkAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
-{
+bool JuceSynthFrameworkAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const {
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
     return true;
@@ -159,30 +167,28 @@ void JuceSynthFrameworkAudioProcessor::updateFilter() {
         stateVariableFilter.state->type = dsp::StateVariableFilter::Parameters<float>::Type::lowPass;
         stateVariableFilter.state->setCutOffFrequency(lastSampleRate, freq, res);
     }
-    
     if (menuChoice == 1) {
         stateVariableFilter.state->type = dsp::StateVariableFilter::Parameters<float>::Type::highPass;
         stateVariableFilter.state->setCutOffFrequency(lastSampleRate, freq, res);
     }
 }
 
-void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
-{
+void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages) {
     ScopedNoDenormals noDenormals;
-    //const int totalNumInputChannels  = getTotalNumInputChannels();
-    //const int totalNumOutputChannels = getTotalNumOutputChannels();
-    
-    //change color of keyboard on press
-    MidiMessage msg;
-    int ignore;
-    for (MidiBuffer::Iterator it (midiMessages); it.getNextEvent (msg, ignore);) {
-        if(msg.isNoteOn()) {
-            keyboardState.noteOn(msg.getChannel(), msg.getNoteNumber(), msg.getVelocity() / 127.0f);
-        }
-        else if(msg.isNoteOff()) {
-            keyboardState.noteOff(msg.getChannel(), msg.getNoteNumber(), msg.getVelocity() / 127.0f);
-        }
-    }
+    const int totalNumInputChannels  = getTotalNumInputChannels();
+    const int totalNumOutputChannels = getTotalNumOutputChannels();
+
+	//change color of keyboard on press
+	MidiMessage msg;
+	int ignore;
+	for (MidiBuffer::Iterator it(midiMessages); it.getNextEvent(msg, ignore);) {
+		if (msg.isNoteOn()) {
+			keyboardState.noteOn(msg.getChannel(), msg.getNoteNumber(), msg.getVelocity() / 127.0f);
+		}
+		else if (msg.isNoteOff()) {
+			keyboardState.noteOff(msg.getChannel(), msg.getNoteNumber(), msg.getVelocity() / 127.0f);
+		}
+	}
 
     //get the voice and get the params needed to make the voice
     for (int i = 0; i < mySynth.getNumVoices(); i++) {
@@ -205,6 +211,7 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
             myVoice->getWillsParams(tree.getRawParameterValue("mastergain"),
                                     tree.getRawParameterValue("blend"),
                                     tree.getRawParameterValue("blend2"),
+                                    tree.getRawParameterValue("blend3"),
                                     tree.getRawParameterValue("pbup"),
                                     tree.getRawParameterValue("pbdown"));
         }
@@ -212,9 +219,73 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
     
     buffer.clear();
     mySynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    bool isCrushOn = tree.getRawParameterValue("crushTog") > (float*) 1;
+
+    if (isCrushOn) {
+        int numSamples = buffer.getNumSamples();
+        //float noiseAmt = -120 + 120 * (50 / 100); // dB
+        int bitDepth = (int)tree.getRawParameterValue("CrushRes");
+        int rateDivide = (int)tree.getRawParameterValue("CrushDown");
+        float noiseAmt = -120 + 120 * (rateDivide / 100); // dB
+
+        if (noiseBuffer.getNumSamples() != numSamples) {
+            noiseBuffer.setSize(2, numSamples, false, true, true); // clears
+            currentOutputBuffer.setSize(2, numSamples, false, true, true); // clears
+        }
+
+        currentOutputBuffer.copyFrom(0, 0, buffer.getReadPointer(0), numSamples);
+        if (buffer.getNumChannels() > 1) {
+            currentOutputBuffer.copyFrom(1, 0, buffer.getReadPointer(1), numSamples);
+        }
+
+        // BUILD NOISE ::::
+        {
+            noiseBuffer.clear();
+            Array<float> noise = getSimpleNoise(numSamples);
+            // range bound
+            noiseAmt = jlimit<float>(0, 1, noiseAmt);
+            FloatVectorOperations::multiply(noise.getRawDataPointer(), noiseAmt, numSamples);
+
+            // ADD the noise ...
+            FloatVectorOperations::add(noiseBuffer.getWritePointer(0), noise.getRawDataPointer(), numSamples);
+            FloatVectorOperations::add(noiseBuffer.getWritePointer(1), noise.getRawDataPointer(), numSamples); // STEREO
+
+            // MULTIPLY MODE :::::
+            // Multiply the noise by the signal ... so 0 signal -> 0 noise
+            //        {
+            //            FloatVectorOperations::multiply(noiseBuffer.getWritePointer(0), currentOutputBuffer.getWritePointer(0), numSamples);
+            //            FloatVectorOperations::multiply(noiseBuffer.getWritePointer(1), currentOutputBuffer.getWritePointer(1), numSamples);
+            //        }
+
+        }
+        // ADD NOISE to the incoming AUDIO ::::
+        currentOutputBuffer.addFrom(0, 0, noiseBuffer.getReadPointer(0), numSamples);
+        currentOutputBuffer.addFrom(1, 0, noiseBuffer.getReadPointer(1), numSamples);
+
+        // RESAMPLE AS NEEDED :::::
+        for (int chan = 0; chan < currentOutputBuffer.getNumChannels(); chan++) {
+            float* data = currentOutputBuffer.getWritePointer(chan);
+            for (int i = 0; i < numSamples; i++) {
+                // REDUCE BIT DEPTH :::::
+                float totalQLevels = powf(2, bitDepth);
+                float val = data[i];
+                float remainder = fmodf(val, 1 / totalQLevels);
+                // Quantize ...
+                data[i] = val - remainder;
+
+                if (rateDivide > 1) {
+                    if (i % rateDivide != 0) data[i] = data[i - i % rateDivide];
+                }
+            }
+        }
+        // COPY to the actual output buffer :::
+        buffer.copyFrom(0, 0, currentOutputBuffer, 0, 0, numSamples);
+        buffer.copyFrom(1, 0, currentOutputBuffer, 1, 0, numSamples);
+    }
     updateFilter();
-    dsp::AudioBlock<float> block (buffer);
-    stateVariableFilter.process(dsp::ProcessContextReplacing<float> (block));
+    dsp::AudioBlock<float> block(buffer);
+    stateVariableFilter.process(dsp::ProcessContextReplacing<float>(block));
 }
 
 //==============================================================================

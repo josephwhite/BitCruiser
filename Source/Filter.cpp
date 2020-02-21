@@ -16,7 +16,6 @@ processor(p)
     
     filterMenu.addItem("Low Pass", 1);
     filterMenu.addItem("High Pass", 2);
-    //filterMenu.addItem("Band Pass", 3);
     filterMenu.setJustificationType(Justification::centred);
     addAndMakeVisible(&filterMenu);
     filterTypeVal = new AudioProcessorValueTreeState::ComboBoxAttachment (processor.tree, "filterType", filterMenu);
@@ -26,12 +25,14 @@ processor(p)
     filterCutoff.setValue (400.0);
     filterCutoff.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
     addAndMakeVisible(&filterCutoff);
+	filterCutoff.setTooltip("Sets the cutoff frequency.");
     filterVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "filterCutoff", filterCutoff);
     filterCutoff.setSkewFactorFromMidPoint(1000.0);
     
     filterRes.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     filterRes.setRange(1, 5);
     filterRes.setValue(1);
+	filterRes.setTooltip("Sets the resonance at the cutoff frequency.");
     filterRes.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
     addAndMakeVisible(&filterRes);
     resVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "filterRes", filterRes);
@@ -62,6 +63,6 @@ void Filter::resized()
     juce::Rectangle<int> area = getLocalBounds().reduced(40);
     
     filterMenu.setBounds(area.removeFromTop(20));
-    filterCutoff.setBounds (30, 55, 70, 70);
-    filterRes.setBounds (30, 100, 70, 70);
+    filterCutoff.setBounds (30, 55, 68, 68);
+    filterRes.setBounds (30, 100, 68, 68);
 }
