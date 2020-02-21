@@ -63,7 +63,7 @@ private:
     SynthVoice* myVoice;
     MidiKeyboardState keyboardState;
     dsp::ProcessorDuplicator<dsp::StateVariableFilter::Filter<float> , dsp::StateVariableFilter::Parameters<float>> stateVariableFilter;
-    
+    AudioSampleBuffer noiseBuffer, currentOutputBuffer;
     double lastSampleRate;
     
     //==============================================================================

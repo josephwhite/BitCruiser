@@ -28,6 +28,7 @@ processor(p)
     Blendslider.setRange(0.0f, 1.0f);
     Blendslider.setValue(1.0f);
     Blendslider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+	Blendslider.setTooltip("Determines how much of this waveform affects Osc 1.");
     addAndMakeVisible(&Blendslider);
     
     //sends value of the sliders to the tree state in the processor

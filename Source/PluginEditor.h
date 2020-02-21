@@ -16,6 +16,7 @@
 #include "MidiKeyboardComp.h"
 #include "Envelope.h"
 #include "Filter.h"
+#include "Crusher.h"
 #include "Frontgui.h"
 
 //==============================================================================
@@ -38,8 +39,10 @@ private:
     Oscillator3 osc3Gui;
     Oscillator4 osc4Gui;
     Filter filterGui;
+    Crusher crusherGui;
     MidiKeyboardComp keyboardComponent;
     TextButton keyboardButton;
+	TooltipWindow tooltip;
     //Envelope envGui;
     //Frontgui frontGui;
 

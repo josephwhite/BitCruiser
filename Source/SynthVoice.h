@@ -135,10 +135,11 @@ public:
         return env1.adsr(setOscType(), env1.trigger);
     }
     
-    void getWillsParams(float* mGain, float* blend, float* blend2, float* pbup, float* pbdn) {
+    void getWillsParams(float* mGain, float* blend, float* blend2, float* blend3, float* pbup, float* pbdn) {
         masterGain = *mGain;
         osc2blend = *blend;
         osc3blend = *blend2;
+        osc4blend = *blend3;
         pitchBendUpSemitones = *pbup;
         pitchBendDownSemitones = *pbdn;
     }
@@ -160,7 +161,6 @@ public:
     void stopNote (float velocity, bool allowTailOff) override {
         env1.trigger = 0;
         allowTailOff = true;
-        
         if (velocity == 0)
             clearCurrentNote();
     }
