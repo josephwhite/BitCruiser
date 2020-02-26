@@ -18,6 +18,7 @@
 #include "Filter.h"
 #include "Crusher.h"
 #include "Frontgui.h"
+#include "SimpReverb.h"
 
 //==============================================================================
 /**
@@ -40,6 +41,7 @@ private:
     Oscillator4 osc4Gui;
     Filter filterGui;
     Crusher crusherGui;
+    SimpReverb reverbGui;
     MidiKeyboardComp keyboardComponent;
     TextButton keyboardButton;
 	TooltipWindow tooltip;

@@ -18,6 +18,7 @@ JuceSynthFrameworkAudioProcessorEditor::JuceSynthFrameworkAudioProcessorEditor (
     , osc4Gui(p)
     , filterGui(p)
     , crusherGui(p)
+    , reverbGui(p)
     , keyboardComponent (keyboardState, MidiKeyboardComponent::horizontalKeyboard)//, envGui(p), frontGui(p)
 {
     setSize (1000, 400);
@@ -28,6 +29,7 @@ JuceSynthFrameworkAudioProcessorEditor::JuceSynthFrameworkAudioProcessorEditor (
     addAndMakeVisible(&osc4Gui);
     addAndMakeVisible(&filterGui);
     addAndMakeVisible(&crusherGui);
+    addAndMakeVisible(&reverbGui);
     addAndMakeVisible(keyboardComponent);
     addAndMakeVisible(keyboardButton);
     keyboardButton.setButtonText("61");
@@ -93,6 +95,7 @@ void JuceSynthFrameworkAudioProcessorEditor::resized() {
     osc4Gui.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
     filterGui.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
     crusherGui.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
+    reverbGui.setBounds(area.removeFromLeft(componentWidth).removeFromTop(componentHeight));
 }
 
 

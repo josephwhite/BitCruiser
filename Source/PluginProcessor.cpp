@@ -225,9 +225,9 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
     if (isCrushOn) {
         int numSamples = buffer.getNumSamples();
         //float noiseAmt = -120 + 120 * (50 / 100); // dB
-        int bitDepth = (int)tree.getRawParameterValue("CrushRes");
-        int rateDivide = (int)tree.getRawParameterValue("CrushDown");
-        float noiseAmt = -120 + 120 * (rateDivide / 100); // dB
+        //int bitDepth = (int)tree.getRawParameterValue("CrushRes");
+        //int rateDivide = (int)tree.getRawParameterValue("CrushDown");
+        //float noiseAmt = -120 + 120 * (rateDivide / 100); // dB
 
         if (noiseBuffer.getNumSamples() != numSamples) {
             noiseBuffer.setSize(2, numSamples, false, true, true); // clears
@@ -244,8 +244,8 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
             noiseBuffer.clear();
             Array<float> noise = getSimpleNoise(numSamples);
             // range bound
-            noiseAmt = jlimit<float>(0, 1, noiseAmt);
-            FloatVectorOperations::multiply(noise.getRawDataPointer(), noiseAmt, numSamples);
+            //noiseAmt = jlimit<float>(0, 1, noiseAmt);
+            //FloatVectorOperations::multiply(noise.getRawDataPointer(), noiseAmt, numSamples);
 
             // ADD the noise ...
             FloatVectorOperations::add(noiseBuffer.getWritePointer(0), noise.getRawDataPointer(), numSamples);
@@ -268,15 +268,15 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
             float* data = currentOutputBuffer.getWritePointer(chan);
             for (int i = 0; i < numSamples; i++) {
                 // REDUCE BIT DEPTH :::::
-                float totalQLevels = powf(2, bitDepth);
+                //float totalQLevels = powf(2, bitDepth);
                 float val = data[i];
-                float remainder = fmodf(val, 1 / totalQLevels);
+                //float remainder = fmodf(val, 1 / totalQLevels);
                 // Quantize ...
-                data[i] = val - remainder;
+                //data[i] = val - remainder;
 
-                if (rateDivide > 1) {
-                    if (i % rateDivide != 0) data[i] = data[i - i % rateDivide];
-                }
+//                if (rateDivide > 1) {
+//                    if (i % rateDivide != 0) data[i] = data[i - i % rateDivide];
+//                }
             }
         }
         // COPY to the actual output buffer :::
