@@ -62,8 +62,7 @@ JuceSynthFrameworkAudioProcessor::JuceSynthFrameworkAudioProcessor()
 	keyCount = 61;
 }
 
-JuceSynthFrameworkAudioProcessor::~JuceSynthFrameworkAudioProcessor()
-{
+JuceSynthFrameworkAudioProcessor::~JuceSynthFrameworkAudioProcessor() {
 }
 
 const String JuceSynthFrameworkAudioProcessor::getName() const {
@@ -220,14 +219,20 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
     buffer.clear();
     mySynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    bool isCrushOn = tree.getRawParameterValue("crushTog") > (float*) 1;
+    bool isCrushOn = *(tree.getRawParameterValue("crushTog")) > 1.2f;
 
     if (isCrushOn) {
         int numSamples = buffer.getNumSamples();
         //float noiseAmt = -120 + 120 * (50 / 100); // dB
+<<<<<<< HEAD
         //int bitDepth = (int)tree.getRawParameterValue("CrushRes");
         //int rateDivide = (int)tree.getRawParameterValue("CrushDown");
         //float noiseAmt = -120 + 120 * (rateDivide / 100); // dB
+=======
+        int bitDepth = (int) tree.getRawParameterValue("CrushRes");
+        int rateDivide = (int) tree.getRawParameterValue("CrushDown");
+        float noiseAmt = -120 + 120 * (rateDivide / 100); // dB
+>>>>>>> 10332c937b8cc9c361b068cac9884731f584df29
 
         if (noiseBuffer.getNumSamples() != numSamples) {
             noiseBuffer.setSize(2, numSamples, false, true, true); // clears
@@ -247,16 +252,9 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
             //noiseAmt = jlimit<float>(0, 1, noiseAmt);
             //FloatVectorOperations::multiply(noise.getRawDataPointer(), noiseAmt, numSamples);
 
-            // ADD the noise ...
-            FloatVectorOperations::add(noiseBuffer.getWritePointer(0), noise.getRawDataPointer(), numSamples);
+            // Add the noise ...
+            FloatVectorOperations::add(noiseBuffer.getWritePointer(0), noise.getRawDataPointer(), numSamples); // MONO
             FloatVectorOperations::add(noiseBuffer.getWritePointer(1), noise.getRawDataPointer(), numSamples); // STEREO
-
-            // MULTIPLY MODE :::::
-            // Multiply the noise by the signal ... so 0 signal -> 0 noise
-            //        {
-            //            FloatVectorOperations::multiply(noiseBuffer.getWritePointer(0), currentOutputBuffer.getWritePointer(0), numSamples);
-            //            FloatVectorOperations::multiply(noiseBuffer.getWritePointer(1), currentOutputBuffer.getWritePointer(1), numSamples);
-            //        }
 
         }
         // ADD NOISE to the incoming AUDIO ::::
@@ -283,6 +281,7 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
         buffer.copyFrom(0, 0, currentOutputBuffer, 0, 0, numSamples);
         buffer.copyFrom(1, 0, currentOutputBuffer, 1, 0, numSamples);
     }
+
     updateFilter();
     dsp::AudioBlock<float> block(buffer);
     stateVariableFilter.process(dsp::ProcessContextReplacing<float>(block));
@@ -300,13 +299,11 @@ AudioProcessorEditor* JuceSynthFrameworkAudioProcessor::createEditor() {
 //==============================================================================
 void JuceSynthFrameworkAudioProcessor::getStateInformation (MemoryBlock& destData) {
     // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    // You could do that either as raw data, or use the XML or ValueTree classes as intermediaries to make it easy to save and load complex data.
 }
 
 void JuceSynthFrameworkAudioProcessor::setStateInformation (const void* data, int sizeInBytes) {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    // You should use this method to restore your parameters from this memory block, whose contents will have been created by the getStateInformation() call.
 }
 
 //==============================================================================
