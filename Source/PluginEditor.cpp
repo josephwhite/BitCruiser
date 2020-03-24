@@ -21,7 +21,7 @@ JuceSynthFrameworkAudioProcessorEditor::JuceSynthFrameworkAudioProcessorEditor (
     , reverbGui(p)
     , keyboardComponent (keyboardState, MidiKeyboardComponent::horizontalKeyboard)//, envGui(p), frontGui(p)
 {
-    setSize (1000, 400);
+    setSize (1050, 400);
     
     addAndMakeVisible(&oscGui);
     addAndMakeVisible(&osc2Gui);

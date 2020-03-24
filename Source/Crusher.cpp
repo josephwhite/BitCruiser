@@ -27,7 +27,7 @@ processor(p)
 	crushDown.setTooltip("Diminishes the audio signal per bit.");
     addAndMakeVisible(&crushDown);
     crushDownVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "crushDown", crushDown);
-    crushDown.setSkewFactorFromMidPoint(1000.0);
+    crushDown.setSkewFactorFromMidPoint(25.0);
     
     crushRes.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     crushRes.setRange(1, 32);

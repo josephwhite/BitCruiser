@@ -46,12 +46,10 @@ processor(p)
         releaseVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "release", releaseSlider);
 }
 
-Envelope::~Envelope()
-{
+Envelope::~Envelope() {
 }
 
-void Envelope::paint (Graphics& g)
-{
+void Envelope::paint (Graphics& g) {
     //fancy stuff for the UI background etc
     juce::Rectangle<int> titleArea (0, 10, getWidth(), 20);
     
@@ -71,8 +69,7 @@ void Envelope::paint (Graphics& g)
     g.drawRoundedRectangle(area, 20.0f, 2.0f);
 }
 
-void Envelope::resized()
-{
+void Envelope::resized() {
     //draws the sliders...we use a rectangle object to dynamically size the UI (if we want to resize for IPad etc without needing to change ALL settings
     juce::Rectangle<int> area = getLocalBounds().reduced(50);
     

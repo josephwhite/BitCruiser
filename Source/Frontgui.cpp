@@ -34,12 +34,10 @@ processor(p)
     pbdownVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "pbdown", pbdownSlider);
 }
 
-Frontgui::~Frontgui()
-{
+Frontgui::~Frontgui() {
 }
 
-void Frontgui::paint (Graphics& g)
-{
+void Frontgui::paint (Graphics& g) {
     //fancy stuff for the UI background etc
     juce::Rectangle<int> titleArea (0, 10, getWidth(), 20);
     
@@ -51,16 +49,13 @@ void Frontgui::paint (Graphics& g)
     g.drawText ("Master", 53, 40, 40, 20, Justification::centredLeft);
     g.drawText ("PB Up/Down", 53, 90, 90, 20, Justification::centredLeft);
     
-    
-    
     juce::Rectangle<float> area (25, 25, 150, 150);
     
     g.setColour(Colours::pink);
     g.drawRoundedRectangle(area, 20.0f, 2.0f);
 }
 
-void Frontgui::resized()
-{
+void Frontgui::resized() {
     //draws the sliders...we use a rectangle object to dynamically size the UI (if we want to resize for IPad etc without needing to change ALL settings
     juce::Rectangle<int> area = getLocalBounds().reduced(50);
     int sliderWidth = 25;
@@ -70,7 +65,6 @@ void Frontgui::resized()
     mastergainSlider.setBounds (45, 20, 120, 100 );
     pbdownSlider.setBounds (area.removeFromBottom(sliderWidth).removeFromTop(sliderHeight).withTrimmedTop(10));
     pbupSlider.setBounds (area.removeFromBottom(sliderHeight).removeFromTop(sliderWidth).withTrimmedTop(10));
-    
 }
 
 

@@ -17,8 +17,8 @@
 #include "Envelope.h"
 #include "Filter.h"
 #include "Crusher.h"
-#include "Frontgui.h"
 #include "SimpReverb.h"
+#include "Frontgui.h"
 
 //==============================================================================
 /**

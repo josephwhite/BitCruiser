@@ -223,16 +223,14 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
 
     if (isCrushOn) {
         int numSamples = buffer.getNumSamples();
-        //float noiseAmt = -120 + 120 * (50 / 100); // dB
-<<<<<<< HEAD
-        //int bitDepth = (int)tree.getRawParameterValue("CrushRes");
-        //int rateDivide = (int)tree.getRawParameterValue("CrushDown");
-        //float noiseAmt = -120 + 120 * (rateDivide / 100); // dB
-=======
-        int bitDepth = (int) tree.getRawParameterValue("CrushRes");
-        int rateDivide = (int) tree.getRawParameterValue("CrushDown");
+        float bitDepthF = *(tree.getRawParameterValue("crushRes"));
+        int bitDepth = (int)round(bitDepthF);
+        float rateDivideF =  *(tree.getRawParameterValue("crushDown"));
+        int rateDivide = (int)round(rateDivideF);
         float noiseAmt = -120 + 120 * (rateDivide / 100); // dB
->>>>>>> 10332c937b8cc9c361b068cac9884731f584df29
+
+        cout << "Bit Depth: " << bitDepth << endl;
+        cout << "Rate Divide: " << rateDivide << endl;
 
         if (noiseBuffer.getNumSamples() != numSamples) {
             noiseBuffer.setSize(2, numSamples, false, true, true); // clears
@@ -244,40 +242,41 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
             currentOutputBuffer.copyFrom(1, 0, buffer.getReadPointer(1), numSamples);
         }
 
-        // BUILD NOISE ::::
+        // Building Noise
         {
             noiseBuffer.clear();
             Array<float> noise = getSimpleNoise(numSamples);
             // range bound
-            //noiseAmt = jlimit<float>(0, 1, noiseAmt);
-            //FloatVectorOperations::multiply(noise.getRawDataPointer(), noiseAmt, numSamples);
+            noiseAmt = jlimit<float>(0, 1, noiseAmt);
+            FloatVectorOperations::multiply(noise.getRawDataPointer(), noiseAmt, numSamples);
 
             // Add the noise ...
             FloatVectorOperations::add(noiseBuffer.getWritePointer(0), noise.getRawDataPointer(), numSamples); // MONO
             FloatVectorOperations::add(noiseBuffer.getWritePointer(1), noise.getRawDataPointer(), numSamples); // STEREO
 
         }
-        // ADD NOISE to the incoming AUDIO ::::
+        // Add noise to the incoming audio
         currentOutputBuffer.addFrom(0, 0, noiseBuffer.getReadPointer(0), numSamples);
         currentOutputBuffer.addFrom(1, 0, noiseBuffer.getReadPointer(1), numSamples);
 
-        // RESAMPLE AS NEEDED :::::
+        // Resample as needed
         for (int chan = 0; chan < currentOutputBuffer.getNumChannels(); chan++) {
             float* data = currentOutputBuffer.getWritePointer(chan);
             for (int i = 0; i < numSamples; i++) {
-                // REDUCE BIT DEPTH :::::
-                //float totalQLevels = powf(2, bitDepth);
+                // Reduce bit depth
+                float totalQLevels = powf(2, bitDepth);
                 float val = data[i];
-                //float remainder = fmodf(val, 1 / totalQLevels);
-                // Quantize ...
-                //data[i] = val - remainder;
-
-//                if (rateDivide > 1) {
-//                    if (i % rateDivide != 0) data[i] = data[i - i % rateDivide];
-//                }
+                float remainder = fmodf(val, 1/totalQLevels);
+                // Quantize
+                data[i] = val - remainder;
+                if (rateDivide > 1) {
+                    if (i % rateDivide != 0) {
+                        data[i] = data[i - i%rateDivide];
+                    }
+                }
             }
         }
-        // COPY to the actual output buffer :::
+        // Copy to the actual output buffer
         buffer.copyFrom(0, 0, currentOutputBuffer, 0, 0, numSamples);
         buffer.copyFrom(1, 0, currentOutputBuffer, 1, 0, numSamples);
     }

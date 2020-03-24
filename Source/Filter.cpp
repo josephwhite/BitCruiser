@@ -38,12 +38,10 @@ processor(p)
     resVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "filterRes", filterRes);
 }
 
-Filter::~Filter()
-{
+Filter::~Filter() {
 }
 
-void Filter::paint (Graphics& g)
-{
+void Filter::paint (Graphics& g) {
     //background ui stuff
     juce::Rectangle<int> titleArea (0, 10, getWidth(), 20);
     
@@ -57,11 +55,8 @@ void Filter::paint (Graphics& g)
     g.drawRoundedRectangle(area, 20.0f, 2.0f);
 }
 
-void Filter::resized()
-{
-    //need to come back and dynamically set these...ok for now
+void Filter::resized() {
     juce::Rectangle<int> area = getLocalBounds().reduced(40);
-    
     filterMenu.setBounds(area.removeFromTop(20));
     filterCutoff.setBounds (30, 55, 68, 68);
     filterRes.setBounds (30, 100, 68, 68);
