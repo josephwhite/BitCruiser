@@ -16,14 +16,16 @@ processor(p)
     reverbAmount.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     reverbAmount.setRange(0.0f, 1.0f);
     reverbAmount.setValue (0.5f);
-    reverbAmount.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    reverbAmount.setTextBoxStyle(Slider::NoTextBox, false, 30, 30);
+    reverbAmount.setTooltip("Sets the amount of reverb.");
     addAndMakeVisible(&reverbAmount);
     amountVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "reverbAmount", reverbAmount);
 
     reverbDryWet.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     reverbDryWet.setRange(0.0f, 1.0f);
     reverbDryWet.setValue(0.5f);
-    reverbDryWet.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    reverbDryWet.setTextBoxStyle(Slider::NoTextBox, false, 30, 30);
+    reverbAmount.setTooltip("Sets the mix between the wet and dry signals.");
     addAndMakeVisible(&reverbDryWet);
     wetDryVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "reverbDryWet", reverbDryWet);
 

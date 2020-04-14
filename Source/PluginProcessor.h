@@ -65,7 +65,7 @@ private:
     dsp::ProcessorDuplicator<dsp::StateVariableFilter::Filter<float> , dsp::StateVariableFilter::Parameters<float>> stateVariableFilter;
     AudioSampleBuffer noiseBuffer, currentOutputBuffer;
     double lastSampleRate;
-    
+    ScopedPointer<Reverb> reverb;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceSynthFrameworkAudioProcessor)
 };

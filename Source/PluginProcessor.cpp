@@ -46,6 +46,8 @@ JuceSynthFrameworkAudioProcessor::JuceSynthFrameworkAudioProcessor()
             std::make_unique<AudioParameterFloat>("crushDown", "CrushDown", NormalisableRange<float>(1.0f, 50.0f), 1.0f),
             std::make_unique<AudioParameterFloat>("crushRes", "CrushRes", NormalisableRange<float>(1.0f, 32.0f), 32.0f),
             std::make_unique<AudioParameterFloat>("crushTog", "CrushTog", NormalisableRange<float>(1.0f, 2.0f), 1.0f),
+            std::make_unique<AudioParameterFloat>("reverbAmount", "RevAmount", NormalisableRange<float>(0.0f, 1.0f), 0.6f),
+            std::make_unique<AudioParameterFloat>("reverbDryWet", "RevDryWet",NormalisableRange<float>(0.0f, 1.0f), 0.6f),
             std::make_unique<AudioParameterFloat>("mastergain", "MasterGain", NormalisableRange<float>(0.0f, 1.0f), 0.7f),
             std::make_unique<AudioParameterFloat>("pbup", "PBup", NormalisableRange<float>(1.0f, 12.0f), 2.0f),
             std::make_unique<AudioParameterFloat>("pbdown", "PBdown", NormalisableRange<float>(1.0f, 12.0f), 2.0f),
@@ -117,7 +119,7 @@ void JuceSynthFrameworkAudioProcessor::changeProgramName (int index, const Strin
 
 //==============================================================================
 void JuceSynthFrameworkAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
-    ignoreUnused(samplesPerBlock);
+    //ignoreUnused(samplesPerBlock);
     lastSampleRate = sampleRate;
     mySynth.setCurrentPlaybackSampleRate(lastSampleRate);
     
@@ -129,6 +131,12 @@ void JuceSynthFrameworkAudioProcessor::prepareToPlay (double sampleRate, int sam
     stateVariableFilter.reset();
     stateVariableFilter.prepare(spec);
     updateFilter();
+
+    //ignoreUnused(samplesPerBlock);
+
+    reverb = new Reverb;
+    reverb->setSampleRate(sampleRate);
+    reverb->reset();
 }
 
 void JuceSynthFrameworkAudioProcessor::releaseResources() {
@@ -219,8 +227,8 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
     buffer.clear();
     mySynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
+    // Bitcrusher
     bool isCrushOn = *(tree.getRawParameterValue("crushTog")) > 1.2f;
-
     if (isCrushOn) {
         int numSamples = buffer.getNumSamples();
         float bitDepthF = *(tree.getRawParameterValue("crushRes"));
@@ -281,9 +289,26 @@ void JuceSynthFrameworkAudioProcessor::processBlock (AudioSampleBuffer& buffer, 
         buffer.copyFrom(1, 0, currentOutputBuffer, 1, 0, numSamples);
     }
 
+    // Pass Filter
     updateFilter();
     dsp::AudioBlock<float> block(buffer);
     stateVariableFilter.process(dsp::ProcessContextReplacing<float>(block));
+
+    // Reverb
+    Reverb::Parameters p;
+    p.roomSize = 0.5f;
+    p.damping = *tree.getRawParameterValue("reverbAmount");
+    p.wetLevel = *tree.getRawParameterValue("reverbDryWet");
+    p.dryLevel = 1.0f - p.wetLevel;
+    p.width = 1.0f;
+    reverb->setParameters(p);
+
+    if (getNumInputChannels() == 1) {
+        reverb->processMono(buffer.getWritePointer(0), buffer.getNumSamples());
+    }
+    else {
+        reverb->processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
+    }
 }
 
 //==============================================================================

@@ -23,7 +23,7 @@ processor(p)
     crushDown.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     crushDown.setRange(1, 50);
     crushDown.setValue(1);
-    crushDown.setTextBoxStyle(Slider::NoTextBox, false, 20, 20);
+    crushDown.setTextBoxStyle(Slider::NoTextBox, false, 30, 30);
 	crushDown.setTooltip("Diminishes the audio signal per bit.");
     addAndMakeVisible(&crushDown);
     crushDownVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "crushDown", crushDown);
@@ -32,7 +32,7 @@ processor(p)
     crushRes.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     crushRes.setRange(1, 32);
     crushRes.setValue(32);
-    crushRes.setTextBoxStyle(Slider::NoTextBox, false, 20, 20);
+    crushRes.setTextBoxStyle(Slider::NoTextBox, false, 30, 30);
 	crushRes.setTooltip("Determines how many bits will define the audio signal.");
     addAndMakeVisible(&crushRes);
     crushResVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "crushRes", crushRes);

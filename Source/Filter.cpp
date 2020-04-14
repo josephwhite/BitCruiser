@@ -23,7 +23,7 @@ processor(p)
     filterCutoff.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     filterCutoff.setRange(20.0, 10000.0);
     filterCutoff.setValue (400.0);
-    filterCutoff.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    filterCutoff.setTextBoxStyle(Slider::NoTextBox, false, 30, 30);
     addAndMakeVisible(&filterCutoff);
 	filterCutoff.setTooltip("Sets the cutoff frequency.");
     filterVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "filterCutoff", filterCutoff);
@@ -33,7 +33,7 @@ processor(p)
     filterRes.setRange(1, 5);
     filterRes.setValue(1);
 	filterRes.setTooltip("Sets the resonance at the cutoff frequency.");
-    filterRes.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    filterRes.setTextBoxStyle(Slider::NoTextBox, false, 30, 30);
     addAndMakeVisible(&filterRes);
     resVal = new AudioProcessorValueTreeState::SliderAttachment (processor.tree, "filterRes", filterRes);
 }
